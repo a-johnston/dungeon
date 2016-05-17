@@ -1,0 +1,11 @@
+*.bin
+*.out
+*.swp
+*.o
+*.gch
+bin/*
+docs/*
+include/*
+lib/*
+CMakeCache.txt
+CMakeFiles/*
