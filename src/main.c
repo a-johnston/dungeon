@@ -4,6 +4,7 @@
 #define TITLE "Dungeon"
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    (void) window;
     (void) scancode;
     (void) mods;
 
@@ -17,4 +18,9 @@ int main() {
     add_key_callback(key_callback);
 
     add_actor(make_player_actor());
+    add_actor(make_cube_actor());
+
+    start_main_loop();
+
+    return EXIT_SUCCESS;
 }

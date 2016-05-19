@@ -9,7 +9,8 @@ struct player_data {
 
 int w, a, s, d;
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    (void) window;
     (void) scancode;
     (void) mods;
 
@@ -19,7 +20,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_D) d = (action != GLFW_RELEASE);
 }
 
-void* create() {
+static void* create() {
     struct player_data *data = (struct player_data*) malloc(sizeof(struct player_data));
     
     data->pos = (vec3) { 0.0, 0.0, 0.0 };
@@ -39,16 +40,23 @@ void* create() {
     return data;
 }
 
-void step(void *void_data, double time) {
+static void step(void *void_data, double time) {
+    (void) time;
     struct player_data *data = (struct player_data*) void_data;
 
-    data->pos.x += d - a;
-    data->pos.y += w - s;
+    double ws = w - s;
+    double da = d - a;
 
     double yaw;
     double pitch;
 
     get_cursor_position(&yaw, &pitch);
+
+    yaw   /= -100;
+    pitch /= -100;
+
+    data->pos.x += (da * sin(yaw) + ws * cos(yaw)) * 0.2;
+    data->pos.y += (da * cos(yaw) + ws * sin(yaw)) * 0.2;
 
     vec3 to = {
         cos(yaw) * cos(pitch),
@@ -56,10 +64,12 @@ void step(void *void_data, double time) {
         sin(pitch)
     };
 
-    cam_update_view(&data->camera, NULL, &to, NULL);
+    to = add_vec3(to, data->pos);
+
+    cam_update_view(&data->camera, &data->pos, &to, NULL);
 }
 
-void destroy(void *data) {
+static void destroy(void *data) {
     free(data);
     remove_key_callback(key_callback);
 }

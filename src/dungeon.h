@@ -1,7 +1,9 @@
 #include <5kgl.h>
 
 /*
- * Player stuff
+ * Actor stuff
  */
 
 Actor* make_player_actor();
+
+Actor* make_cube_actor();
