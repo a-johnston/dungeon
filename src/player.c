@@ -55,8 +55,8 @@ static void step(void *void_data, double time) {
     yaw   /= -100;
     pitch /= -100;
 
-    data->pos.x += (da * sin(yaw) + ws * cos(yaw)) * 0.2;
-    data->pos.y += (da * cos(yaw) + ws * sin(yaw)) * 0.2;
+    data->pos.x += ( da * sin(yaw) + ws * cos(yaw)) * 0.2;
+    data->pos.y += (-da * cos(yaw) + ws * sin(yaw)) * 0.2;
 
     vec3 to = {
         cos(yaw) * cos(pitch),
