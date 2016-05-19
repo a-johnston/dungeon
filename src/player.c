@@ -7,7 +7,7 @@ struct player_data {
     Camera camera;
 };
 
-int w, a, s, d;
+int w, a, s, d, jump;
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     (void) window;
@@ -18,6 +18,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     if (key == GLFW_KEY_A) a = (action != GLFW_RELEASE);
     if (key == GLFW_KEY_S) s = (action != GLFW_RELEASE);
     if (key == GLFW_KEY_D) d = (action != GLFW_RELEASE);
+    if (key == GLFW_KEY_SPACE) jump = (action != GLFW_RELEASE);
 }
 
 static void* create() {
@@ -34,7 +35,7 @@ static void* create() {
 
     set_main_camera(&data->camera);
 
-    w = a = s = d = 0;
+    w = a = s = d = jump = 0;
     add_key_callback(key_callback);
 
     return data;
@@ -55,8 +56,24 @@ static void step(void *void_data, double time) {
     yaw   /= -100;
     pitch /= -100;
 
-    data->pos.x += ( da * sin(yaw) + ws * cos(yaw)) * 0.2;
-    data->pos.y += (-da * cos(yaw) + ws * sin(yaw)) * 0.2;
+    data->v.x /= 2.0;
+    data->v.y /= 2.0;
+
+    if (ws != 0 || da != 0) {
+        data->v.x += ( da * sin(yaw) + ws * cos(yaw)) * 0.1;
+        data->v.y += (-da * cos(yaw) + ws * sin(yaw)) * 0.1;
+    }
+
+    data->pos = add_vec3(data->pos, data->v);
+
+    if (data->pos.z < 0) {
+        data->pos.z = 0;
+        data->v.z = 0;
+    } else if (data->pos.z > 0) {
+        data->v.z -= 0.05;
+    } else if (jump) {
+        data->v.z = 0.5;
+    }
 
     vec3 to = {
         cos(yaw) * cos(pitch),
