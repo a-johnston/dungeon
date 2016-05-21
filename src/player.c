@@ -56,15 +56,18 @@ static void step(void *void_data, double time) {
     yaw   /= -100;
     pitch /= -100;
 
+    double limit = M_PI / 2.0 - 0.01;
+    pitch = clamp(-limit, pitch, limit);
+
     data->v.x /= 2.0;
     data->v.y /= 2.0;
 
     if (ws != 0 || da != 0) {
-        data->v.x += ( da * sin(yaw) + ws * cos(yaw)) * 0.1;
-        data->v.y += (-da * cos(yaw) + ws * sin(yaw)) * 0.1;
+        data->v.x += ( da * sin(yaw) + ws * cos(yaw));
+        data->v.y += (-da * cos(yaw) + ws * sin(yaw));
     }
 
-    data->pos = add_vec3(data->pos, data->v);
+    data->pos = add_vec3(data->pos, mult_vec3(data->v, time));
 
     if (data->pos.z < 0) {
         data->pos.z = 0;
