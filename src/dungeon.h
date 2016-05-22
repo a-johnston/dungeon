@@ -1,6 +1,14 @@
 #include <5kgl.h>
 
 /*
+ * Asset stuff
+ */
+
+#define COLOR_SHADER "COLORSHADER"
+
+void make_shaders();
+
+/*
  * Actor stuff
  */
 

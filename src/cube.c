@@ -13,13 +13,8 @@ static void* create() {
     struct cube_data *data = (struct cube_data*) malloc(sizeof(struct cube_data));
 
     // shader creation and variable mapping
-    data->shader = make_shader("assets/color_vertex.glsl", "assets/color_fragment.glsl");
-
-    map_shader_attrib(data->shader, VERT, "position");
-    map_shader_attrib(data->shader, NORM, "normal");
-
-    map_shader_uniform(data->shader, MATRIX_4FV, "mvp", 1);
-    map_shader_uniform(data->shader, MATRIX_4FV, "model", 1);
+    make_shaders();
+    data->shader = get_from_store(COLOR_SHADER);
 
     // shader uniforms
     data->uniforms = create_list();
