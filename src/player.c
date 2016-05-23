@@ -3,6 +3,7 @@
 struct player_data {
     vec3 pos;
     vec3 v;
+    double yaw, pitch;
 
     Camera camera;
 };
@@ -24,8 +25,10 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 static void* create() {
     struct player_data *data = (struct player_data*) malloc(sizeof(struct player_data));
     
-    data->pos = (vec3) { 0.0, 0.0, 0.0 };
-    data->v   = (vec3) { 0.0, 0.0, 0.0 };
+    data->pos = (vec3) { -5.0, 0.0, 0.0 };
+    data->v   = (vec3) {  0.0, 0.0, 0.0 };
+
+    data->yaw = data->pitch = 0.0;
 
     vec3 to = (vec3) { 1.0, 0.0, 0.0 };
     vec3 up = (vec3) { 0.0, 0.0, 1.0 };
@@ -48,40 +51,44 @@ static void step(void *void_data, double time) {
     double ws = w - s;
     double da = d - a;
 
-    double yaw;
-    double pitch;
+    double dx;
+    double dy;
 
-    get_cursor_position(&yaw, &pitch);
+    get_cursor_delta(&dx, &dy);
 
-    yaw   /= -100;
-    pitch /= -100;
+    dx /= -100;
+    dy /= -100;
+
+    data->yaw   += dx;
+    data->pitch += dy;
 
     double limit = M_PI / 2.0 - 0.01;
-    pitch = clamp(-limit, pitch, limit);
+    data->pitch = clamp(-limit, data->pitch, limit);
 
     data->v.x /= 2.0;
     data->v.y /= 2.0;
 
     if (ws != 0 || da != 0) {
-        data->v.x += ( da * sin(yaw) + ws * cos(yaw));
-        data->v.y += (-da * cos(yaw) + ws * sin(yaw));
+        data->v.x += (-da * sin(data->yaw) - ws * cos(data->yaw));
+        data->v.y += ( da * cos(data->yaw) - ws * sin(data->yaw));
     }
-
-    data->pos = add_vec3(data->pos, mult_vec3(data->v, time));
 
     if (data->pos.z < 0) {
         data->pos.z = 0;
         data->v.z = 0;
     } else if (data->pos.z > 0) {
-        data->v.z -= 0.05;
+        data->v.z += 0.2;
     } else if (jump) {
-        data->v.z = 0.5;
+        printf("JUMP\n");
+        data->v.z = -4;
     }
 
+    data->pos = add_vec3(data->pos, mult_vec3(data->v, time * 2.0));
+
     vec3 to = {
-        cos(yaw) * cos(pitch),
-        sin(yaw) * cos(pitch),
-        sin(pitch)
+        cos(data->yaw) * cos(data->pitch),
+        sin(data->yaw) * cos(data->pitch),
+        sin(data->pitch)
     };
 
     to = add_vec3(to, data->pos);
